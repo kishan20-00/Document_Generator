@@ -106,33 +106,38 @@ def get_input_with_speech_to_text(field_name, session_key):
     
     return input_text
 
-# Input fields with speech-to-text
+# Input fields with speech-to-text (Business Name, Domain, Business Scope)
 business_name = get_input_with_speech_to_text("Business Name", "business_name")
 domain = get_input_with_speech_to_text("Domain", "domain")
 user_input = get_input_with_speech_to_text("Business Scope", "user_input")
 
-# Check if the inputs are empty
-if not business_name or not domain or not user_input:
-    st.warning("Please enter all the required details before generating the report.")
-else:
-    # Prepare prompt
-    prompt = generate_prompt(business_name, domain, user_input)
-    
-    # Generate the report
-    full_output = generate_report(prompt)
-    
-    # Extract generated content only (removing the prompt)
-    clean_output = extract_generated_content(prompt, full_output)
-    
-    # Display generated report
-    st.subheader(f"Generated Report for {business_name}")
-    st.text_area("Generated Business Report", clean_output, height=400)
-    
-    # Provide PDF download option
-    pdf_buffer = save_to_pdf(clean_output)
-    st.download_button(
-        label="Download Report as PDF",
-        data=pdf_buffer,
-        file_name=f"{business_name}_Business_Report.pdf",
-        mime="application/pdf"
-    )
+# Button to trigger report generation
+generate_button = st.button("Generate Report")
+
+# Ensure the user inputs are passed to the model when the button is clicked
+if generate_button:
+    # Ensure all fields are filled before generating the report
+    if not business_name or not domain or not user_input:
+        st.warning("Please fill out all the fields before generating the report.")
+    else:
+        # Prepare prompt
+        prompt = generate_prompt(business_name, domain, user_input)
+        
+        # Generate the report
+        full_output = generate_report(prompt)
+        
+        # Extract generated content only (removing the prompt)
+        clean_output = extract_generated_content(prompt, full_output)
+        
+        # Display generated report
+        st.subheader(f"Generated Report for {business_name}")
+        st.text_area("Generated Business Report", clean_output, height=400)
+        
+        # Provide PDF download option
+        pdf_buffer = save_to_pdf(clean_output)
+        st.download_button(
+            label="Download Report as PDF",
+            data=pdf_buffer,
+            file_name=f"{business_name}_Business_Report.pdf",
+            mime="application/pdf"
+        )
